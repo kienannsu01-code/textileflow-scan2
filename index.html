@@ -1,1491 +1,247 @@
-
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#172554">
-  <title>TextileFlow Scan – May Hải</title>
-
-  <style>
-    :root {
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      color:#172033;
-      background:#f3f6fb;
-    }
-
-    * { box-sizing:border-box }
-    body { margin:0 }
-
-    main {
-      max-width:760px;
-      margin:auto;
-      padding:16px;
-    }
-
-    header {
-      background:#172554;
-      color:white;
-      padding:18px 16px;
-      border-radius:16px;
-      margin-bottom:14px;
-    }
-
-    h1 { font-size:21px; margin:0 0 4px }
-    header p { margin:0; color:#dbeafe; font-size:13px }
-
-    .card {
-      background:white;
-      border:1px solid #e2e8f0;
-      border-radius:14px;
-      padding:14px;
-      margin:12px 0;
-      box-shadow:0 2px 8px #0f172a0a;
-    }
-
-    label {
-      display:block;
-      font-weight:650;
-      font-size:14px;
-      margin:0 0 7px;
-    }
-
-    select,input {
-      width:100%;
-      padding:12px;
-      border:1px solid #cbd5e1;
-      border-radius:10px;
-      font-size:16px;
-      background:white;
-    }
-
-    .grid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .muted { color:#64748b; font-size:12px }
-
-    .status {
-      padding:10px 12px;
-      border-radius:10px;
-      background:#eff6ff;
-      color:#1e40af;
-      font-size:13px;
-      white-space:pre-wrap;
-      overflow-wrap:anywhere;
-    }
-
-    .status.err { background:#fef2f2; color:#991b1b }
-    .status.ok { background:#ecfdf5; color:#065f46 }
-    .status.warn { background:#fff7ed; color:#9a3412 }
-
-    .video-wrap {
-      position:relative;
-      background:#0f172a;
-      border-radius:12px;
-      overflow:hidden;
-      min-height:220px;
-    }
-
-    video {
-      display:block;
-      width:100%;
-      max-height:65vh;
-      object-fit:contain;
-      background:#0f172a;
-    }
-
-    /* Chỉ là khung quan sát toàn bộ tem, không dùng để cắt ảnh OCR */
-    .guide {
-      position:absolute;
-      inset:3%;
-      border:1px dashed #38bdf8;
-      border-radius:8px;
-      pointer-events:none;
-    }
-
-    .guide-label {
-      position:absolute;
-      top:5%;
-      left:50%;
-      transform:translateX(-50%);
-      color:white;
-      background:#172554bb;
-      padding:4px 9px;
-      border-radius:6px;
-      font-size:11px;
-      pointer-events:none;
-    }
-
-    .scan-feedback {
-      display:none;
-      position:absolute;
-      z-index:5;
-      top:42%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      color:white;
-      background:#16a34a;
-      font-size:48px;
-      font-weight:900;
-      padding:12px 30px;
-      border-radius:18px;
-      box-shadow:0 5px 25px #0006;
-      pointer-events:none;
-    }
-
-    .scan-feedback.show {
-      display:block;
-      animation:scanPlus .8s ease-out;
-    }
-
-    @keyframes scanPlus {
-      0% {
-        opacity:0;
-        transform:translate(-50%,0) scale(.5);
-      }
-      25% {
-        opacity:1;
-        transform:translate(-50%,-20px) scale(1.15);
-      }
-      100% {
-        opacity:0;
-        transform:translate(-50%,-65px) scale(1);
-      }
-    }
-
-    .buttons {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    button {
-      border:0;
-      border-radius:10px;
-      padding:13px 12px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-      background:#1d4ed8;
-      color:white;
-    }
-
-    button.secondary { background:#e2e8f0; color:#1e293b }
-    button.danger { background:#b91c1c }
-    button:disabled { opacity:.45; cursor:not-allowed }
-
-    .stats {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-    }
-
-    .stat {
-      background:#f8fafc;
-      border-radius:10px;
-      padding:10px;
-      text-align:center;
-    }
-
-    .stat b { display:block; font-size:19px }
-    .stat span { font-size:11px; color:#64748b }
-
-    textarea {
-      width:100%;
-      min-height:110px;
-      border:1px solid #cbd5e1;
-      border-radius:10px;
-      padding:10px;
-      font:13px ui-monospace,monospace;
-    }
-
-    .small {
-      font-size:12px;
-      color:#64748b;
-      line-height:1.5;
-    }
-
-    .hidden { display:none!important }
-
-    @media(max-width:480px) {
-      main { padding:10px }
-      .grid { grid-template-columns:1fr }
-      .buttons { grid-template-columns:1fr 1fr }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#172554">
+<title>TextileFlow Scan – May Hai</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#172033;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0}main{max-width:760px;margin:auto;padding:14px}
+header{background:#172554;color:white;padding:18px 16px;border-radius:16px;margin-bottom:14px}
+h1{font-size:21px;margin:0 0 4px}header p{margin:0;color:#dbeafe;font-size:13px}
+.card{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 8px #0f172a0a}
+label{display:block;font-weight:650;font-size:14px;margin:0 0 7px}
+select,input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;background:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.muted{color:#64748b;font-size:12px}
+.status{padding:10px 12px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.status.err{background:#fef2f2;color:#991b1b}.status.ok{background:#ecfdf5;color:#065f46}
+.video-wrap{position:relative;background:#0f172a;border-radius:12px;overflow:hidden;min-height:220px}
+video{display:block;width:100%;max-height:62vh;object-fit:contain;background:#0f172a}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button{border:0;border-radius:10px;padding:13px 12px;font-size:15px;font-weight:700;cursor:pointer;background:#1d4ed8;color:white}
+button.secondary{background:#e2e8f0;color:#1e293b}button.danger{background:#b91c1c}button:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:19px}.stat span{font-size:11px;color:#64748b}
+textarea{width:100%;min-height:76px;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:13px ui-monospace,monospace}
+.small{font-size:12px;color:#64748b;line-height:1.5}.success-flash{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+background:#064e3bcc;color:white;font-size:clamp(48px,15vw,88px);font-weight:900;opacity:0;pointer-events:none;z-index:5}
+.success-flash.show{animation:flash .75s ease-out}
+@keyframes flash{0%{opacity:0;transform:scale(.8)}20%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(1.08)}}
+@media(max-width:480px){main{padding:10px}.grid{grid-template-columns:1fr}}
+</style>
 </head>
-
 <body>
 <main>
+<header><h1>TextileFlow Scan</h1><p>May Hai · Camera trực tiếp · OCR trên thiết bị · Chỉ lưu 2 dòng đầu tem</p></header>
 
-  <header>
-    <h1>TextileFlow Scan</h1>
-    <p>May Hải · Camera toàn tem · Tự tìm đường phân cách · Tesseract.js 5</p>
-  </header>
+<section class="card">
+ <div class="grid">
+  <div><label for="styleSelect">Style / Đơn hàng</label><select id="styleSelect"><option value="">Đang tải danh sách Style…</option></select></div>
+  <div><label for="seasonDisplay">Mùa SX</label><input id="seasonDisplay" readonly placeholder="Tự động theo Style"></div>
+ </div>
+ <p class="muted">Chọn Style; Mùa SX được lấy tự động từ sheet STYLE.</p>
+ <label for="accessPin">Mã PIN ghi dữ liệu</label><input id="accessPin" type="password" inputmode="numeric" autocomplete="off" placeholder="Nhập mã PIN do quản trị cấp">
+ <div class="buttons"><button id="reloadBtn" class="secondary">Tải lại Style</button><button id="pingBtn" class="secondary">Kiểm tra kết nối</button></div>
+</section>
 
-  <!-- CHỌN STYLE -->
-  <section class="card">
-    <div class="grid">
-      <div>
-        <label for="styleSelect">Style / Đơn hàng</label>
-        <select id="styleSelect">
-          <option value="">Đang tải danh sách Style…</option>
-        </select>
-      </div>
+<section class="card">
+ <label>Camera sau – chụp toàn bộ tem</label>
+ <div class="video-wrap"><video id="video" autoplay muted playsinline></video><div id="successFlash" class="success-flash">+1</div></div>
+ <div class="buttons"><button id="startBtn">Bật camera và quét</button><button id="stopBtn" class="danger" disabled>Dừng camera</button></div>
+ <p class="small">Đưa toàn bộ tem vào hình camera, không cần căn chỉnh khung. Ứng dụng nhận diện chữ trên ảnh, sắp xếp các dòng theo vị trí từ trên xuống và CHỈ gửi 2 dòng đầu tiên vào CSDL. Nên giữ tem đứng yên khoảng 1 giây khi đưa vào.</p>
+</section>
 
-      <div>
-        <label for="seasonDisplay">Mùa SX</label>
-        <input id="seasonDisplay" readonly placeholder="Tự động theo Style">
-      </div>
-    </div>
+<section class="card">
+ <label>Trạng thái</label><div id="status" class="status">Đang khởi tạo ứng dụng…</div>
+ <div class="stats" style="margin-top:10px">
+  <div class="stat"><b id="countOk">0</b><span>Đã ghi CSDL</span></div>
+  <div class="stat"><b id="countFail">0</b><span>OCR lỗi</span></div>
+  <div class="stat"><b id="countTotal">0</b><span>Tổng lượt</span></div>
+ </div>
+</section>
 
-    <p class="muted">
-      Style và Mùa SX được lấy từ sheet STYLE.
-    </p>
-
-    <div style="margin-top:12px">
-      <label for="accessPin">Mã PIN ghi dữ liệu</label>
-      <input
-        id="accessPin"
-        type="password"
-        inputmode="numeric"
-        autocomplete="off"
-        placeholder="Nhập mã PIN do quản trị cấp"
-      >
-      <p class="muted">
-        PIN được thiết lập trong Script Properties với tên TFS_ACCESS_PIN.
-      </p>
-    </div>
-
-    <div class="buttons">
-      <button id="reloadBtn" class="secondary">Tải lại Style</button>
-      <button id="pingBtn" class="secondary">Kiểm tra kết nối</button>
-    </div>
-  </section>
-
-  <!-- CAMERA -->
-  <section class="card">
-    <label>Camera sau – Chụp toàn bộ tem</label>
-
-    <div class="video-wrap">
-      <video id="video" autoplay muted playsinline></video>
-      <div class="guide"></div>
-      <div class="guide-label">Đặt toàn bộ tem trong vùng quan sát</div>
-      <div id="scanFeedback" class="scan-feedback">+1</div>
-    </div>
-
-    <div class="buttons">
-      <button id="startBtn">Bật camera và quét</button>
-      <button id="stopBtn" class="danger" disabled>Dừng camera</button>
-    </div>
-
-    <p class="small">
-      Camera chụp toàn bộ tem. Ứng dụng tự tìm đường gạch ngang phân cách,
-      chỉ OCR phần phía trên đường gạch. Không cần căn chỉnh vào vùng cắt cố định.
-    </p>
-  </section>
-
-  <!-- TRẠNG THÁI -->
-  <section class="card">
-    <label>Trạng thái</label>
-
-    <div id="status" class="status">
-      Đang khởi tạo ứng dụng…
-    </div>
-
-    <div class="stats" style="margin-top:10px">
-      <div class="stat">
-        <b id="countOk">0</b>
-        <span>Đã ghi CSDL</span>
-      </div>
-
-      <div class="stat">
-        <b id="countFail">0</b>
-        <span>OCR lỗi</span>
-      </div>
-
-      <div class="stat">
-        <b id="countTotal">0</b>
-        <span>Tổng lượt</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- OCR -->
-  <section class="card">
-    <label>Kết quả OCR gần nhất</label>
-    <textarea
-      id="ocrResult"
-      readonly
-      placeholder="Nội dung phía trên đường gạch ngang sẽ hiển thị tại đây…"
-    ></textarea>
-
-    <div class="small" id="lastResult">
-      Chưa có lượt quét.
-    </div>
-  </section>
-
-  <p class="small">
-    Ảnh chỉ xử lý trong bộ nhớ thiết bị, không tải ảnh lên Drive.
-    CSDL chỉ nhận nội dung OCR vùng đầu tem.
-    Không tìm được đường phân cách hoặc OCR rỗng sẽ chuyển vào CSDL_OCR_LOI.
-  </p>
-
+<section class="card">
+ <label>Hai dòng OCR được ghi nhận</label><textarea id="ocrResult" readonly placeholder="Hai dòng đầu tiên của tem sẽ hiển thị tại đây…"></textarea>
+ <div class="small" id="lastResult">Chưa có lượt quét.</div>
+</section>
+<p class="small">Ảnh chỉ được xử lý trong bộ nhớ thiết bị, không tải lên Drive. Chỉ văn bản của 2 dòng đầu tiên được gửi đi. OCR rỗng/lỗi được chuyển vào CSDL_OCR_LOI.</p>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
 <script>
 (() => {
-  'use strict';
+'use strict';
+const API_URL='https://script.google.com/macros/s/AKfycbyKzO4SxllWv2ivAeT0LwdPcEvCBuxmLz6HFr2e3A4GkxO_jG35y-O1ZRwxMUYN7OkI/exec';
+const $=id=>document.getElementById(id);
+const state={styles:[],stream:null,worker:null,running:false,busy:false,previous:null,motionSeen:false,stableAt:0,lastCaptureAt:0,ok:0,fail:0,total:0,raf:0,audio:null};
+const DETECT_W=144,DETECT_H=108,MOTION_THRESHOLD=12,STABLE_MS=800,COOLDOWN_MS=1600,MAX_IMAGE_W=1100;
 
-  /*************************************************
-   * 1. CẤU HÌNH
-   *************************************************/
+function setStatus(msg,type){$('status').textContent=msg;$('status').className='status'+(type?' '+type:'');}
+function apiReady(){return API_URL.startsWith('https://script.google.com/macros/s/')&&API_URL.endsWith('/exec');}
+function jsonp(params,timeoutMs=15000){
+ return new Promise((resolve,reject)=>{
+  const cb='tfs_cb_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),script=document.createElement('script');
+  const query=new URLSearchParams({...params,callback:cb,_ts:String(Date.now())});let timer;
+  window[cb]=data=>{cleanup();resolve(data);};
+  function cleanup(){clearTimeout(timer);delete window[cb];script.remove();}
+  script.onerror=()=>{cleanup();reject(new Error('Không tải được phản hồi Apps Script. Kiểm tra URL /exec và quyền triển khai.'));};
+  timer=setTimeout(()=>{cleanup();reject(new Error('Hết thời gian chờ Apps Script.'));},timeoutMs);
+  script.src=API_URL+'?'+query.toString();document.head.appendChild(script);
+ });
+}
+async function loadStyles(){
+ if(!apiReady())throw new Error('URL Apps Script /exec chưa đúng trong API_URL.');
+ setStatus('Đang tải danh sách Style…');
+ const data=await jsonp({action:'setup'});
+ if(!data||!data.ok)throw new Error(data?.error||'Không tải được danh sách Style.');
+ state.styles=data.styles||[];
+ const select=$('styleSelect');select.innerHTML='<option value="">-- Chọn Style --</option>';
+ state.styles.forEach((item,i)=>{const op=document.createElement('option');op.value=String(i);op.textContent=item.style+' — '+item.season;select.appendChild(op);});
+ $('seasonDisplay').value='';setStatus('Đã tải '+state.styles.length+' cặp Style / Mùa SX.','ok');
+}
+$('styleSelect').addEventListener('change',()=>{const x=state.styles[Number($('styleSelect').value)];$('seasonDisplay').value=x?x.season:'';});
+$('reloadBtn').addEventListener('click',()=>loadStyles().catch(e=>setStatus(e.message,'err')));
+$('pingBtn').addEventListener('click',async()=>{try{const r=await jsonp({action:'ping'});setStatus(r.ok?'Kết nối Apps Script thành công · '+(r.time||'OK'):r.error,'ok');}catch(e){setStatus(e.message,'err');}});
+function selectedStyle(){const v=$('styleSelect').value;if(v===''||!state.styles[Number(v)])throw new Error('Hãy chọn Style trước khi bật camera.');return state.styles[Number(v)];}
+function requestId(){return 'tfs_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,12);}
 
-  const API_URL =
-    'https://script.google.com/macros/s/AKfycbyKzO4SxllWv2ivAeT0LwdPcEvCBuxmLz6HFr2e3A4GkxO_jG35y-O1ZRwxMUYN7OkI/exec';
-
-  const $ = id => document.getElementById(id);
-
-  const state = {
-    styles: [],
-    stream: null,
-    worker: null,
-    audioContext: null,
-
-    running: false,
-    busy: false,
-
-    previous: null,
-    motionSeen: false,
-    stableAt: 0,
-    lastCaptureAt: 0,
-
-    ok: 0,
-    fail: 0,
-    total: 0,
-
-    raf: 0
-  };
-
-  const DETECT_W = 160;
-  const DETECT_H = 120;
-
-  const MOTION_THRESHOLD = 13.5;
-  const STABLE_MS = 950;
-  const COOLDOWN_MS = 2300;
-
-  const MAX_TEXT = 1500;
-
-  /*************************************************
-   * 2. TRẠNG THÁI GIAO DIỆN
-   *************************************************/
-
-  function setStatus(message, type) {
-    const el = $('status');
-    el.textContent = message;
-    el.className = 'status' + (type ? ' ' + type : '');
+async function startCamera(){
+ if(state.running)return;selectedStyle();
+ if(!navigator.mediaDevices?.getUserMedia)throw new Error('Hãy mở trang bằng Chrome HTTPS để sử dụng camera.');
+ try{
+  state.stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+  $('video').srcObject=state.stream;await $('video').play();
+  if(!state.audio){try{state.audio=new (window.AudioContext||window.webkitAudioContext)();await state.audio.resume();}catch(e){}}
+  if(!state.worker){
+   setStatus('Đang khởi tạo OCR lần đầu…');
+   state.worker=await Tesseract.createWorker('eng');
+   await state.worker.setParameters({tessedit_pageseg_mode:Tesseract.PSM.SPARSE_TEXT,preserve_interword_spaces:'1',user_defined_dpi:'220'});
   }
+  state.running=true;state.busy=false;state.previous=null;state.motionSeen=false;state.stableAt=0;
+  $('startBtn').disabled=true;$('stopBtn').disabled=false;
+  setStatus('Camera đã bật. Đưa toàn bộ tem vào hình; hệ thống tự nhận diện.','ok');detectLoop();
+ }catch(e){
+  stopCamera();
+  if(e.name==='NotAllowedError')throw new Error('Chrome chưa được cấp quyền Camera cho github.io. Hãy cho phép Camera trong cài đặt trang.');
+  if(e.name==='NotFoundError')throw new Error('Không tìm thấy camera.');
+  if(e.name==='NotReadableError')throw new Error('Camera đang được ứng dụng khác sử dụng.');
+  throw new Error(e.message||String(e));
+ }
+}
+function stopCamera(){
+ state.running=false;if(state.raf)cancelAnimationFrame(state.raf);state.raf=0;
+ if(state.stream)state.stream.getTracks().forEach(t=>t.stop());state.stream=null;$('video').srcObject=null;
+ $('startBtn').disabled=false;$('stopBtn').disabled=true;
+}
+$('startBtn').addEventListener('click',()=>startCamera().catch(e=>setStatus(e.message,'err')));
+$('stopBtn').addEventListener('click',()=>{stopCamera();setStatus('Đã dừng camera.');});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.running){stopCamera();setStatus('Camera tạm dừng khi rời trang. Nhấn Bật camera để tiếp tục.');}});
 
-  function updateCounters() {
-    $('countOk').textContent = state.ok;
-    $('countFail').textContent = state.fail;
-    $('countTotal').textContent = state.total;
+function detectLoop(){
+ if(!state.running)return;
+ const v=$('video');
+ if(v.readyState>=2&&!state.busy){
+  const c=document.createElement('canvas');c.width=DETECT_W;c.height=DETECT_H;
+  const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(v,0,0,DETECT_W,DETECT_H);
+  const p=ctx.getImageData(0,0,DETECT_W,DETECT_H).data,g=new Uint8Array(DETECT_W*DETECT_H);
+  for(let i=0,j=0;i<p.length;i+=4,j++)g[j]=(p[i]*.299+p[i+1]*.587+p[i+2]*.114)|0;
+  if(state.previous){
+   let diff=0;for(let i=0;i<g.length;i+=3)diff+=Math.abs(g[i]-state.previous[i]);
+   const score=diff/Math.ceil(g.length/3),now=performance.now();
+   if(score>MOTION_THRESHOLD&&now-state.lastCaptureAt>COOLDOWN_MS){state.motionSeen=true;state.stableAt=0;}
+   else if(state.motionSeen){
+    if(!state.stableAt)state.stableAt=now;
+    if(now-state.stableAt>=STABLE_MS&&now-state.lastCaptureAt>COOLDOWN_MS){state.motionSeen=false;state.lastCaptureAt=now;captureAndRead();}
+   }
   }
+  state.previous=g;
+ }
+ state.raf=requestAnimationFrame(detectLoop);
+}
 
-  function apiReady() {
-    return API_URL.startsWith(
-      'https://script.google.com/macros/s/'
-    ) && API_URL.endsWith('/exec');
+/* Giảm kích thước ảnh để tăng tốc; vẫn giữ toàn bộ khung hình, không cắt tem. */
+function makeOcrCanvas(video){
+ const scale=Math.min(1,MAX_IMAGE_W/video.videoWidth),w=Math.max(1,Math.round(video.videoWidth*scale)),h=Math.max(1,Math.round(video.videoHeight*scale));
+ const c=document.createElement('canvas');c.width=w;c.height=h;
+ const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(video,0,0,w,h);
+ const im=x.getImageData(0,0,w,h),d=im.data;
+ for(let i=0;i<d.length;i+=4){
+  const gray=(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
+  const enhanced=Math.max(0,Math.min(255,(gray-105)*1.45+128));
+  d[i]=d[i+1]=d[i+2]=enhanced;
+ }
+ x.putImageData(im,0,0);return c;
+}
+
+/* Lấy hai dòng có tọa độ Y nhỏ nhất; chỉ hai dòng này được đưa vào CSDL. */
+function getFirstTwoLines(result){
+ const lines=(result?.data?.lines||[])
+  .map(line=>({text:String(line.text||'').replace(/\s+/g,' ').trim(),y:Number(line.bbox?.y0??line.baseline?.y0??0),confidence:Number(line.confidence??0)}))
+  .filter(x=>x.text);
+ lines.sort((a,b)=>a.y-b.y);
+ const picked=[];
+ for(const line of lines){
+  if(!picked.some(p=>Math.abs(p.y-line.y)<8&&p.text===line.text))picked.push(line);
+  if(picked.length===2)break;
+ }
+ return picked.map(x=>x.text);
+}
+async function captureAndRead(){
+ if(state.busy||!state.running)return;state.busy=true;
+ try{
+  setStatus('Đang đọc 2 dòng trên cùng của tem…');
+  const canvas=makeOcrCanvas($('video'));
+  const result=await state.worker.recognize(canvas);
+  const firstTwo=getFirstTwoLines(result);
+  const text=firstTwo.join('\n').slice(0,500);
+  $('ocrResult').value=text;state.total++;updateCounters();
+  const chosen=selectedStyle(),id=requestId(),parsed=parseLabel(text);
+  const payload={requestId:id,style:chosen.style,season:chosen.season,ocrText:text,size:parsed.size,gang:parsed.gang,brand:parsed.brand,
+   reason:text?'Không nhận diện được dữ liệu từ hai dòng đầu tiên.':'Không nhận diện được chữ ở vùng tem.'};
+  if(text){
+   const saved=await postAndWait('saveSuccess',payload);
+   if(!saved?.ok)throw new Error(saved?.error||'Không ghi được CSDL.');
+   state.ok++;$('lastResult').textContent='Đã ghi CSDL · '+(saved.savedAt||'')+' · '+chosen.style+' · '+text.replace(/\n/g,' / ');
+   setStatus('Đã ghi nhận 1 tem. Đưa tem tiếp theo vào camera.','ok');showSuccess();
+  }else{
+   const failed=await postAndWait('saveFailure',payload);
+   if(!failed?.ok)throw new Error(failed?.error||'Không ghi được CSDL_OCR_LOI.');
+   state.fail++;$('lastResult').textContent='Không đọc được 2 dòng đầu · Đã lưu CSDL_OCR_LOI.';
+   setStatus('Không đọc được chữ ở hai dòng đầu; đã ghi nhận lỗi OCR.','err');
   }
-
-  /*************************************************
-   * 3. JSONP
-   *************************************************/
-
-  function jsonp(params, timeoutMs = 15000) {
-    return new Promise((resolve, reject) => {
-      const cb =
-        'tfs_cb_' +
-        Date.now() +
-        '_' +
-        Math.random().toString(36).slice(2, 8);
-
-      const script = document.createElement('script');
-
-      const query = new URLSearchParams({
-        ...params,
-        callback: cb,
-        _ts: String(Date.now())
-      });
-
-      let timer;
-
-      window[cb] = data => {
-        cleanup();
-        resolve(data);
-      };
-
-      function cleanup() {
-        clearTimeout(timer);
-        delete window[cb];
-        script.remove();
-      }
-
-      script.onerror = () => {
-        cleanup();
-        reject(new Error(
-          'Không tải được phản hồi Apps Script. Kiểm tra URL /exec và quyền triển khai.'
-        ));
-      };
-
-      timer = setTimeout(() => {
-        cleanup();
-        reject(new Error(
-          'Hết thời gian chờ Apps Script.'
-        ));
-      }, timeoutMs);
-
-      script.src = API_URL + '?' + query.toString();
-      document.head.appendChild(script);
-    });
-  }
-
-  /*************************************************
-   * 4. TẢI STYLE
-   *************************************************/
-
-  async function loadStyles() {
-    if (!apiReady()) {
-      throw new Error(
-        'URL Apps Script /exec chưa được cấu hình.'
-      );
-    }
-
-    setStatus('Đang tải danh sách Style…');
-
-    const data = await jsonp({
-      action: 'setup'
-    });
-
-    if (!data || !data.ok) {
-      throw new Error(
-        data?.error || 'Không tải được danh sách Style.'
-      );
-    }
-
-    state.styles = data.styles || [];
-
-    const select = $('styleSelect');
-
-    select.innerHTML =
-      '<option value="">-- Chọn Style --</option>';
-
-    state.styles.forEach((item, index) => {
-      const option = document.createElement('option');
-
-      option.value = String(index);
-
-      option.textContent =
-        item.style + ' — ' + item.season;
-
-      select.appendChild(option);
-    });
-
-    $('seasonDisplay').value = '';
-
-    setStatus(
-      'Đã tải ' + state.styles.length +
-      ' cặp Style / Mùa SX.',
-      'ok'
-    );
-  }
-
-  $('styleSelect').addEventListener('change', () => {
-    const item =
-      state.styles[Number($('styleSelect').value)];
-
-    $('seasonDisplay').value =
-      item ? item.season : '';
-  });
-
-  $('reloadBtn').addEventListener('click', () => {
-    loadStyles().catch(e => {
-      setStatus(e.message, 'err');
-    });
-  });
-
-  $('pingBtn').addEventListener('click', async () => {
-    try {
-      const r = await jsonp({action:'ping'});
-
-      setStatus(
-        r.ok
-          ? 'Kết nối Apps Script thành công · ' + r.time
-          : r.error,
-        r.ok ? 'ok' : 'err'
-      );
-
-    } catch(e) {
-      setStatus(e.message, 'err');
-    }
-  });
-
-  function selectedStyle() {
-    const value = $('styleSelect').value;
-    const index = Number(value);
-
-    if (!value || !state.styles[index]) {
-      throw new Error(
-        'Hãy chọn Style trước khi bật camera.'
-      );
-    }
-
-    return state.styles[index];
-  }
-
-  function newRequestId() {
-    return 'tfs_' +
-      Date.now().toString(36) +
-      '_' +
-      Math.random().toString(36).slice(2, 12);
-  }
-
-  /*************************************************
-   * 5. CAMERA
-   *************************************************/
-
-  async function startCamera() {
-    if (state.running) return;
-
-    selectedStyle();
-
-    if (
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia
-    ) {
-      throw new Error(
-        'Trình duyệt không hỗ trợ camera. Hãy mở GitHub Pages bằng Chrome HTTPS.'
-      );
-    }
-
-    try {
-      // Khởi tạo âm thanh sau thao tác bấm của người dùng.
-      try {
-        if (!state.audioContext) {
-          state.audioContext = new (
-            window.AudioContext ||
-            window.webkitAudioContext
-          )();
-        }
-
-        if (state.audioContext.state === 'suspended') {
-          await state.audioContext.resume();
-        }
-      } catch(e) {
-        console.warn('Audio không khả dụng:', e);
-      }
-
-      state.stream =
-        await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            facingMode: {ideal:'environment'},
-            width: {ideal:1280},
-            height: {ideal:720}
-          }
-        });
-
-      $('video').srcObject = state.stream;
-
-      await $('video').play();
-
-      if (!state.worker) {
-        setStatus(
-          'Đang tải bộ nhận diện Tesseract.js 5…'
-        );
-
-        state.worker =
-          await Tesseract.createWorker('eng');
-
-        await state.worker.setParameters({
-          tessedit_pageseg_mode:
-            Tesseract.PSM.SINGLE_BLOCK,
-          preserve_interword_spaces: '1'
-        });
-      }
-
-      state.running = true;
-      state.busy = false;
-      state.previous = null;
-
-      state.motionSeen = false;
-      state.stableAt = 0;
-
-      $('startBtn').disabled = true;
-      $('stopBtn').disabled = false;
-
-      setStatus(
-        'Camera đã bật. Đặt toàn bộ tem trước camera. Ứng dụng sẽ tự tìm đường gạch ngang.',
-        'ok'
-      );
-
-      detectLoop();
-
-    } catch(e) {
-      stopCamera();
-
-      if (e.name === 'NotAllowedError') {
-        throw new Error(
-          'Chrome từ chối camera. Kiểm tra quyền Camera của Android và github.io.'
-        );
-      }
-
-      if (e.name === 'NotFoundError') {
-        throw new Error('Không tìm thấy camera.');
-      }
-
-      if (e.name === 'NotReadableError') {
-        throw new Error(
-          'Camera đang được ứng dụng khác sử dụng.'
-        );
-      }
-
-      throw new Error(
-        e.name + ': ' + (e.message || 'Không mở được camera.')
-      );
-    }
-  }
-
-  function stopCamera() {
-    state.running = false;
-
-    if (state.raf) {
-      cancelAnimationFrame(state.raf);
-    }
-
-    state.raf = 0;
-
-    if (state.stream) {
-      state.stream.getTracks().forEach(t => t.stop());
-    }
-
-    state.stream = null;
-    $('video').srcObject = null;
-
-    $('startBtn').disabled = false;
-    $('stopBtn').disabled = true;
-  }
-
-  $('startBtn').addEventListener('click', () => {
-    startCamera().catch(e => {
-      setStatus(e.message, 'err');
-    });
-  });
-
-  $('stopBtn').addEventListener('click', () => {
-    stopCamera();
-    setStatus('Đã dừng camera.');
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && state.running) {
-      stopCamera();
-      setStatus(
-        'Camera đã tạm dừng khi rời trang. Nhấn Bật camera để tiếp tục.'
-      );
-    }
-  });
-
-  /*************************************************
-   * 6. PHÁT HIỆN CHUYỂN ĐỘNG
-   *************************************************/
-
-  function detectLoop() {
-    if (!state.running) return;
-
-    const video = $('video');
-
-    if (
-      video.readyState >= 2 &&
-      !state.busy
-    ) {
-      const c = document.createElement('canvas');
-
-      c.width = DETECT_W;
-      c.height = DETECT_H;
-
-      const ctx = c.getContext(
-        '2d',
-        {willReadFrequently:true}
-      );
-
-      ctx.drawImage(
-        video,
-        0, 0,
-        DETECT_W, DETECT_H
-      );
-
-      const pixels =
-        ctx.getImageData(
-          0, 0,
-          DETECT_W, DETECT_H
-        ).data;
-
-      const gray =
-        new Uint8Array(DETECT_W * DETECT_H);
-
-      for (
-        let i = 0, j = 0;
-        i < pixels.length;
-        i += 4, j++
-      ) {
-        gray[j] = (
-          pixels[i] * 0.299 +
-          pixels[i+1] * 0.587 +
-          pixels[i+2] * 0.114
-        ) | 0;
-      }
-
-      if (state.previous) {
-        let diff = 0;
-
-        for (
-          let i = 0;
-          i < gray.length;
-          i += 3
-        ) {
-          diff += Math.abs(
-            gray[i] - state.previous[i]
-          );
-        }
-
-        const score =
-          diff / Math.ceil(gray.length / 3);
-
-        const now = performance.now();
-
-        if (
-          score > MOTION_THRESHOLD &&
-          now - state.lastCaptureAt > COOLDOWN_MS
-        ) {
-          state.motionSeen = true;
-          state.stableAt = 0;
-
-        } else if (state.motionSeen) {
-
-          if (!state.stableAt) {
-            state.stableAt = now;
-          }
-
-          if (
-            now - state.stableAt >= STABLE_MS &&
-            now - state.lastCaptureAt > COOLDOWN_MS
-          ) {
-            state.motionSeen = false;
-            state.lastCaptureAt = now;
-
-            captureAndRead();
-          }
-        }
-      }
-
-      state.previous = gray;
-    }
-
-    state.raf = requestAnimationFrame(detectLoop);
-  }
-
-  /*************************************************
-   * 7. TÌM ĐƯỜNG GẠCH NGANG TỰ ĐỘNG
-   *
-   * Không dùng tọa độ cắt cố định.
-   * Tìm đoạn ngang tối, dài, mảnh trên ảnh toàn tem.
-   *************************************************/
-
-  function findSeparator(sourceCanvas) {
-    const maxWidth = 1000;
-
-    const scale = Math.min(
-      1,
-      maxWidth / sourceCanvas.width
-    );
-
-    const w = Math.max(
-      1,
-      Math.round(sourceCanvas.width * scale)
-    );
-
-    const h = Math.max(
-      1,
-      Math.round(sourceCanvas.height * scale)
-    );
-
-    const work = document.createElement('canvas');
-
-    work.width = w;
-    work.height = h;
-
-    const ctx = work.getContext(
-      '2d',
-      {willReadFrequently:true}
-    );
-
-    ctx.drawImage(
-      sourceCanvas,
-      0, 0, w, h
-    );
-
-    const image =
-      ctx.getImageData(0, 0, w, h);
-
-    const p = image.data;
-
-    // Chuyển xám.
-    const gray = new Uint8Array(w * h);
-
-    for (let i = 0, j = 0; i < p.length; i += 4, j++) {
-      gray[j] = (
-        p[i] * 0.299 +
-        p[i+1] * 0.587 +
-        p[i+2] * 0.114
-      ) | 0;
-    }
-
-    // Tìm đường tối liên tục theo từng hàng.
-    const candidates = [];
-
-    const yStart = Math.floor(h * 0.08);
-    const yEnd = Math.floor(h * 0.82);
-
-    const xStart = Math.floor(w * 0.04);
-    const xEnd = Math.floor(w * 0.96);
-
-    const minLength = Math.max(
-      45,
-      Math.floor(w * 0.15)
-    );
-
-    for (let y = yStart; y < yEnd; y++) {
-      let start = -1;
-      let lastDark = -1;
-      let darkCount = 0;
-
-      for (let x = xStart; x < xEnd; x++) {
-        const value = gray[y * w + x];
-
-        // Ngưỡng nhận diện nét đen.
-        if (value < 105) {
-          if (start < 0) start = x;
-
-          lastDark = x;
-          darkCount++;
-
-        } else if (
-          start >= 0 &&
-          x - lastDark > 3
-        ) {
-          const length = lastDark - start + 1;
-
-          if (
-            length >= minLength &&
-            darkCount / length > 0.65
-          ) {
-            candidates.push({
-              x1:start,
-              x2:lastDark,
-              y,
-              length,
-              density:darkCount / length
-            });
-          }
-
-          start = -1;
-          lastDark = -1;
-          darkCount = 0;
-        }
-      }
-
-      // Xử lý đoạn kéo đến cuối hàng.
-      if (start >= 0) {
-        const length = lastDark - start + 1;
-
-        if (
-          length >= minLength &&
-          darkCount / length > 0.65
-        ) {
-          candidates.push({
-            x1:start,
-            x2:lastDark,
-            y,
-            length,
-            density:darkCount / length
-          });
-        }
-      }
-    }
-
-    if (!candidates.length) {
-      return null;
-    }
-
-    /*
-     * Gộp các hàng liền kề thuộc cùng một đường.
-     * Đường gạch thường chỉ dày vài pixel.
-     */
-    const groups = [];
-
-    candidates.sort((a,b) => a.y - b.y);
-
-    for (const c of candidates) {
-      let group = groups.find(g =>
-        c.y - g.lastY <= 4 &&
-        Math.abs(c.x1 - g.x1) < 12 &&
-        Math.abs(c.x2 - g.x2) < 12
-      );
-
-      if (!group) {
-        group = {
-          x1:c.x1,
-          x2:c.x2,
-          y:c.y,
-          lastY:c.y,
-          length:c.length,
-          rows:1,
-          density:c.density
-        };
-
-        groups.push(group);
-
-      } else {
-        group.lastY = c.y;
-        group.rows++;
-        group.length = Math.max(
-          group.length,
-          c.length
-        );
-      }
-    }
-
-    /*
-     * Ưu tiên đường ngang dài và mảnh.
-     * Giới hạn chiều dày để tránh chọn dòng chữ.
-     */
-    const valid = groups.filter(g =>
-      g.length >= minLength &&
-      g.rows <= 5
-    );
-
-    if (!valid.length) {
-      return null;
-    }
-
-    /*
-     * Chọn đường ngang có chiều dài lớn nhất.
-     * Khi chiều dài gần bằng nhau, ưu tiên đường nằm
-     * cao hơn trong tem.
-     */
-    valid.sort((a,b) => {
-      const scoreA =
-        a.length / Math.sqrt(a.rows);
-
-      const scoreB =
-        b.length / Math.sqrt(b.rows);
-
-      if (Math.abs(scoreA - scoreB) > 8) {
-        return scoreB - scoreA;
-      }
-
-      return a.y - b.y;
-    });
-
-    const best = valid[0];
-
-    // Tránh các nét quá sát mép trên hoặc mép dưới.
-    if (
-      best.y < h * 0.10 ||
-      best.y > h * 0.78
-    ) {
-      return null;
-    }
-
-    return {
-      x1:Math.round(best.x1 / scale),
-      x2:Math.round(best.x2 / scale),
-      y:Math.round(best.y / scale),
-      strength:best.length,
-      thickness:best.rows
-    };
-  }
-
-  /*************************************************
-   * 8. CẮT VÙNG PHÍA TRÊN ĐƯỜNG GẠCH
-   *************************************************/
-
-  function createLabelOCRCanvas(fullCanvas, line) {
-    const w = fullCanvas.width;
-    const h = fullCanvas.height;
-
-    // Mở rộng hai bên đường gạch để giữ đủ chữ.
-    const lineWidth = line.x2 - line.x1;
-
-    const marginX = Math.round(
-      lineWidth * 0.12
-    );
-
-    const sx = Math.max(
-      0,
-      line.x1 - marginX
-    );
-
-    const ex = Math.min(
-      w,
-      line.x2 + marginX
-    );
-
-    // Cắt từ đầu ảnh đến ngay phía trên đường gạch.
-    const sy = 0;
-    const ey = Math.max(
-      1,
-      line.y - Math.max(2, Math.round(h * 0.003))
-    );
-
-    const sw = ex - sx;
-    const sh = ey - sy;
-
-    if (
-      sw < 40 ||
-      sh < 40
-    ) {
-      throw new Error(
-        'Vùng phía trên đường gạch quá nhỏ.'
-      );
-    }
-
-    const scale = Math.min(
-      4,
-      Math.max(2, 1400 / Math.max(sw, sh))
-    );
-
-    const canvas = document.createElement('canvas');
-
-    canvas.width = Math.round(sw * scale);
-    canvas.height = Math.round(sh * scale);
-
-    const ctx = canvas.getContext(
-      '2d',
-      {willReadFrequently:true}
-    );
-
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    ctx.drawImage(
-      fullCanvas,
-      sx, sy, sw, sh,
-      0, 0,
-      canvas.width, canvas.height
-    );
-
-    // Tăng tương phản, chuyển xám.
-    const image = ctx.getImageData(
-      0, 0,
-      canvas.width,
-      canvas.height
-    );
-
-    const p = image.data;
-
-    for (let i = 0; i < p.length; i += 4) {
-      let gray =
-        p[i] * 0.299 +
-        p[i+1] * 0.587 +
-        p[i+2] * 0.114;
-
-      gray = Math.max(
-        0,
-        Math.min(
-          255,
-          (gray - 128) * 1.45 + 128
-        )
-      );
-
-      p[i] = gray;
-      p[i+1] = gray;
-      p[i+2] = gray;
-    }
-
-    ctx.putImageData(image, 0, 0);
-
-    return canvas;
-  }
-
-  /*************************************************
-   * 9. PHÂN TÍCH SIZE / GIÀNG
-   *************************************************/
-
-  function parseLabel(raw) {
-    const lines = String(raw || '')
-      .replace(/\r/g, '\n')
-      .split('\n')
-      .map(x => x.trim())
-      .filter(Boolean);
-
-    const cleaned = lines.filter(x =>
-      !/EX-LT-4|MADE\s+IN\s+VIETNAM/i.test(x)
-    );
-
-    const text = cleaned.join('\n');
-
-    let size = '';
-
-    const sizePatterns = [
-      /\b\d{1,3}\s*[xX×]\s*\d{1,3}\b/,
-      /\b\d{1,3}\s*\/\s*\d{1,3}\s*[A-Z]?\b/i,
-      /\bSIZE\s*[:#-]?\s*([0-9]{1,3}[A-Z]?)\b/i
-    ];
-
-    for (const re of sizePatterns) {
-      const m = text.match(re);
-
-      if (m) {
-        size = (m[1] || m[0])
-          .replace(/\s+/g,'')
-          .toUpperCase();
-
-        break;
-      }
-    }
-
-    let gang = '';
-
-    if (cleaned.length) {
-      const first = cleaned[0];
-
-      const x = first.match(
-        /^\s*[xX]\s*(\d{1,3})\b/
-      );
-
-      if (x) {
-        gang = x[1];
-
-      } else {
-        const word = first.match(
-          /[A-Za-zÀ-ỹ]+/
-        );
-
-        gang = word
-          ? word[0].charAt(0).toUpperCase()
-          : 'R';
-      }
-
-    } else {
-      gang = 'R';
-    }
-
-    const brand =
-      /\b(EXP|MGF)\b/i.test(text)
-        ? 'Express'
-        : '';
-
-    return {size, gang, brand};
-  }
-
-  /*************************************************
-   * 10. ÂM THANH VÀ HIỆU ỨNG +1
-   *************************************************/
-
-  function playBeep() {
-    try {
-      const ctx = state.audioContext;
-
-      if (!ctx) return;
-
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      const oscillator = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      oscillator.type = 'sine';
-
-      oscillator.frequency.setValueAtTime(
-        1900,
-        ctx.currentTime
-      );
-
-      gain.gain.setValueAtTime(
-        0.0001,
-        ctx.currentTime
-      );
-
-      gain.gain.exponentialRampToValueAtTime(
-        0.25,
-        ctx.currentTime + 0.015
-      );
-
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        ctx.currentTime + 0.13
-      );
-
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + 0.14);
-
-    } catch(e) {
-      console.warn('Không phát được âm thanh:', e);
-    }
-  }
-
-  function showScanSuccess() {
-    const el = $('scanFeedback');
-
-    el.classList.remove('show');
-
-    void el.offsetWidth;
-
-    el.classList.add('show');
-
-    setTimeout(() => {
-      el.classList.remove('show');
-    }, 850);
-
-    playBeep();
-  }
-
-  /*************************************************
-   * 11. CHỤP TOÀN BỘ TEM VÀ OCR
-   *************************************************/
-
-  async function captureAndRead() {
-    if (state.busy || !state.running) return;
-
-    state.busy = true;
-
-    try {
-      const video = $('video');
-
-      // Chụp TOÀN BỘ hình camera.
-      const fullCanvas = document.createElement('canvas');
-
-      fullCanvas.width = video.videoWidth;
-      fullCanvas.height = video.videoHeight;
-
-      fullCanvas.getContext('2d').drawImage(
-        video,
-        0, 0,
-        fullCanvas.width,
-        fullCanvas.height
-      );
-
-      setStatus(
-        'Đang tìm đường gạch ngang trên toàn bộ tem…'
-      );
-
-      // Tìm đường gạch phân cách.
-      const line = findSeparator(fullCanvas);
-
-      if (!line) {
-        throw new Error(
-          'Không tìm thấy đường gạch ngang đáng tin cậy. Hãy giữ tem rõ nét trước camera và thử lại.'
-        );
-      }
-
-      setStatus(
-        'Đã tìm thấy đường phân cách. Đang OCR phần phía trên…',
-        'ok'
-      );
-
-      // Chỉ tạo ảnh OCR phần phía trên đường gạch.
-      const ocrCanvas = createLabelOCRCanvas(
-        fullCanvas,
-        line
-      );
-
-      const result = await state.worker.recognize(
-        ocrCanvas
-      );
-
-      const text = String(
-        result?.data?.text || ''
-      ).trim().slice(0, MAX_TEXT);
-
-      $('ocrResult').value = text;
-
-      state.total++;
-      updateCounters();
-
-      const chosen = selectedStyle();
-      const requestId = newRequestId();
-
-      const parsed = parseLabel(text);
-
-      const payload = {
-        requestId,
-        style:chosen.style,
-        season:chosen.season,
-
-        ocrText:text,
-
-        size:parsed.size,
-        gang:parsed.gang,
-        brand:parsed.brand,
-
-        reason:text
-          ? 'OCR phần đầu tem phía trên đường gạch ngang.'
-          : 'Không nhận diện được nội dung phía trên đường gạch.'
-      };
-
-      if (text) {
-        const saved = await postAndWait(
-          'saveSuccess',
-          payload
-        );
-
-        if (!saved.ok) {
-          throw new Error(
-            saved.error || 'Không ghi được CSDL.'
-          );
-        }
-
-        state.ok++;
-
-        $('lastResult').textContent =
-          'Đã ghi CSDL · ' +
-          (saved.savedAt || '') +
-          ' · Style ' +
-          chosen.style +
-          ' · Size ' +
-          (parsed.size || 'chưa xác định');
-
-        setStatus(
-          'Đã ghi CSDL thành công. Đưa tem tiếp theo vào camera.',
-          'ok'
-        );
-
-        // Chỉ +1 sau xác nhận ghi thành công.
-        showScanSuccess();
-
-      } else {
-        const failed = await postAndWait(
-          'saveFailure',
-          payload
-        );
-
-        if (!failed.ok) {
-          throw new Error(
-            failed.error ||
-            'Không ghi được danh sách OCR lỗi.'
-          );
-        }
-
-        state.fail++;
-
-        $('lastResult').textContent =
-          'OCR rỗng · Đã chuyển vào CSDL_OCR_LOI · Style ' +
-          chosen.style;
-
-        setStatus(
-          'Không đọc được chữ phía trên đường gạch. Đã lưu vào CSDL_OCR_LOI.',
-          'err'
-        );
-      }
-
-      updateCounters();
-
-    } catch(e) {
-      setStatus(
-        'Lỗi lượt quét: ' + e.message,
-        'err'
-      );
-
-      $('lastResult').textContent =
-        'Lượt quét chưa được xác nhận ghi dữ liệu.';
-
-    } finally {
-      state.busy = false;
-
-      state.previous = null;
-      state.motionSeen = false;
-      state.stableAt = 0;
-    }
-  }
-
-  /*************************************************
-   * 12. GỬI DỮ LIỆU VÀ CHỜ XÁC NHẬN
-   *************************************************/
-
-  async function postAndWait(action, payload) {
-    const pin = $('accessPin').value.trim();
-
-    if (!pin) {
-      throw new Error(
-        'Bạn chưa nhập mã PIN ghi dữ liệu.'
-      );
-    }
-
-    const body = new URLSearchParams();
-
-    body.set('action', action);
-    body.set('data', JSON.stringify(payload));
-    body.set('pin', pin);
-
-    /*
-     * Giữ nguyên cơ chế POST no-cors và JSONP status
-     * của phiên bản Apps Script đang sử dụng.
-     */
-    await fetch(API_URL, {
-      method:'POST',
-      mode:'no-cors',
-      redirect:'follow',
-      headers:{
-        'Content-Type':
-          'application/x-www-form-urlencoded;charset=UTF-8'
-      },
-      body:body.toString()
-    });
-
-    for (let i = 0; i < 12; i++) {
-      await new Promise(resolve =>
-        setTimeout(resolve, 900)
-      );
-
-      const status = await jsonp({
-        action:'status',
-        requestId:payload.requestId
-      }, 10000);
-
-      if (status.done) {
-        return status.result;
-      }
-
-      if (status.ok === false) {
-        return status;
-      }
-    }
-
-    throw new Error(
-      'Chưa nhận được xác nhận từ Apps Script. Kiểm tra nhật ký trước khi quét lại để tránh ghi trùng.'
-    );
-  }
-
-  /*************************************************
-   * 13. KHỞI ĐỘNG
-   *************************************************/
-
-  loadStyles().catch(e => {
-    setStatus(e.message, 'err');
-  });
-
+  updateCounters();
+ }catch(e){setStatus('Lỗi lượt quét: '+e.message,'err');}
+ finally{state.busy=false;state.previous=null;state.motionSeen=false;state.stableAt=0;}
+}
+function parseLabel(raw){
+ const lines=String(raw||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ const top=lines.slice(0,2).join(' ');
+ let size='';
+ const patterns=[/\b\d{1,3}\s*[xX×]\s*\d{1,3}\b/,/\b\d{2,3}\s*\/\s*\d{2,3}\s*[A-Z]?\b/i,/\bSIZE\s*[:#-]?\s*([0-9]{1,3}[A-Z]?)\b/i];
+ for(const re of patterns){const m=top.match(re);if(m){size=(m[1]||m[0]).replace(/\s+/g,'').toUpperCase();break;}}
+ const first=lines[0]||'',x=first.match(/^\s*[xX]\s*(\d{1,3})\b/);
+ const word=first.match(/[A-Za-zÀ-ỹ]+/);const gang=x?x[1]:(word?word[0][0].toUpperCase():'R');
+ const brand=/\b(EXP|MGF)\b/i.test(top)?'Express':'';
+ return {size,gang,brand};
+}
+async function postAndWait(action,payload){
+ const pin=$('accessPin').value.trim();if(!pin)throw new Error('Bạn chưa nhập mã PIN ghi dữ liệu.');
+ const body=new URLSearchParams();body.set('action',action);body.set('data',JSON.stringify(payload));body.set('pin',pin);
+ await fetch(API_URL,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:body.toString()});
+ for(let i=0;i<14;i++){
+  await new Promise(r=>setTimeout(r,650));
+  const s=await jsonp({action:'status',requestId:payload.requestId},9000);
+  if(s.done)return s.result;if(s.ok===false)return s;
+ }
+ throw new Error('Chưa nhận được xác nhận từ Apps Script. Kiểm tra nhật ký trước khi quét lại để tránh ghi trùng.');
+}
+function updateCounters(){$('countOk').textContent=state.ok;$('countFail').textContent=state.fail;$('countTotal').textContent=state.total;}
+function showSuccess(){
+ const el=$('successFlash');el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+ try{if(state.audio){const o=state.audio.createOscillator(),g=state.audio.createGain();o.type='sine';o.frequency.value=1450;g.gain.value=.12;o.connect(g);g.connect(state.audio.destination);o.start();o.stop(state.audio.currentTime+.11);}}catch(e){}
+}
+loadStyles().catch(e=>setStatus(e.message,'err'));
 })();
 </script>
 </body>
