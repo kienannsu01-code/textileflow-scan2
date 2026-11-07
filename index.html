@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#172554">
-<title>TextileFlow Scan – May Hai</title>
+<title>TextileFlow Scan – May Hải</title>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#172033;background:#f3f6fb}
 *{box-sizing:border-box}body{margin:0}main{max-width:760px;margin:auto;padding:14px}
@@ -33,7 +33,7 @@ background:#064e3bcc;color:white;font-size:clamp(48px,15vw,88px);font-weight:900
 </head>
 <body>
 <main>
-<header><h1>TextileFlow Scan</h1><p>May Hai · Camera trực tiếp · OCR trên thiết bị · Chỉ lưu 2 dòng đầu tem</p></header>
+<header><h1>TextileFlow Scan</h1><p>May Hải · Camera trực tiếp · OCR trên thiết bị · Chỉ lưu 2 dòng đầu tem</p></header>
 
 <section class="card">
  <div class="grid">
@@ -49,7 +49,7 @@ background:#064e3bcc;color:white;font-size:clamp(48px,15vw,88px);font-weight:900
  <label>Camera sau – chụp toàn bộ tem</label>
  <div class="video-wrap"><video id="video" autoplay muted playsinline></video><div id="successFlash" class="success-flash">+1</div></div>
  <div class="buttons"><button id="startBtn">Bật camera và quét</button><button id="stopBtn" class="danger" disabled>Dừng camera</button></div>
- <p class="small">Đưa toàn bộ tem vào hình camera, không cần căn chỉnh khung. Ứng dụng nhận diện chữ trên ảnh, sắp xếp các dòng theo vị trí từ trên xuống và CHỈ gửi 2 dòng đầu tiên vào CSDL. Nên giữ tem đứng yên khoảng 1 giây khi đưa vào.</p>
+ <p class="small">Đưa toàn bộ tem vào hình camera, không cần căn chỉnh khung. Ứng dụng nhận diện chữ trên ảnh, sắp xếp các dòng theo vị trí từ trên xuống và CHỈ gửi 2 dòng đầu tiên vào CSDL. Thuật toán ưu tiên 2 hàng chữ trên cùng (ví dụ: 6 / 160/70A), bỏ các biểu tượng và phần hướng dẫn giặt phía dưới. Nên giữ tem đứng yên khoảng 1 giây khi đưa vào.</p>
 </section>
 
 <section class="card">
@@ -62,7 +62,7 @@ background:#064e3bcc;color:white;font-size:clamp(48px,15vw,88px);font-weight:900
 </section>
 
 <section class="card">
- <label>Hai dòng OCR được ghi nhận</label><textarea id="ocrResult" readonly placeholder="Hai dòng đầu tiên của tem sẽ hiển thị tại đây…"></textarea>
+ <label>Hai dòng OCR được ghi nhận (mã dòng 1 + cỡ vóc dòng 2)</label><textarea id="ocrResult" readonly placeholder="Hai dòng đầu tiên của tem sẽ hiển thị tại đây…"></textarea>
  <div class="small" id="lastResult">Chưa có lượt quét.</div>
 </section>
 <p class="small">Ảnh chỉ được xử lý trong bộ nhớ thiết bị, không tải lên Drive. Chỉ văn bản của 2 dòng đầu tiên được gửi đi. OCR rỗng/lỗi được chuyển vào CSDL_OCR_LOI.</p>
@@ -160,59 +160,119 @@ function detectLoop(){
  state.raf=requestAnimationFrame(detectLoop);
 }
 
-/* Giảm kích thước ảnh để tăng tốc; vẫn giữ toàn bộ khung hình, không cắt tem. */
+/*
+ * Mẫu tem May Hải:
+ *   Dòng 1: mã/cỡ đơn (ví dụ: 6)
+ *   Dòng 2: thông số cỡ vóc (ví dụ: 160/70A)
+ * Camera vẫn lấy TOÀN BỘ khung hình. Chỉ tạo ảnh xử lý OCR phóng lớn,
+ * tăng tương phản; không cắt theo dấu gạch ngang hoặc biểu tượng giặt.
+ */
 function makeOcrCanvas(video){
- const scale=Math.min(1,MAX_IMAGE_W/video.videoWidth),w=Math.max(1,Math.round(video.videoWidth*scale)),h=Math.max(1,Math.round(video.videoHeight*scale));
+ const scale=Math.min(3,Math.max(2,1800/video.videoWidth));
+ const w=Math.max(1,Math.round(video.videoWidth*scale));
+ const h=Math.max(1,Math.round(video.videoHeight*scale));
  const c=document.createElement('canvas');c.width=w;c.height=h;
- const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(video,0,0,w,h);
+ const x=c.getContext('2d',{willReadFrequently:true});
+ x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+ x.drawImage(video,0,0,w,h);
  const im=x.getImageData(0,0,w,h),d=im.data;
+ // Khử màu nền vải, tăng tương phản chữ in; giữ ảnh xám để tránh mất nét mảnh.
  for(let i=0;i<d.length;i+=4){
   const gray=(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
-  const enhanced=Math.max(0,Math.min(255,(gray-105)*1.45+128));
+  const enhanced=Math.max(0,Math.min(255,(gray-142)*1.85+128));
   d[i]=d[i+1]=d[i+2]=enhanced;
  }
- x.putImageData(im,0,0);return c;
+ x.putImageData(im,0,0);
+ return c;
 }
-
-/* Lấy hai dòng có tọa độ Y nhỏ nhất; chỉ hai dòng này được đưa vào CSDL. */
+function normalizeOcrLine(value){
+ return String(value||'').replace(/[|¦]/g,'I').replace(/[“”‘’]/g,"'")
+  .replace(/[^\p{L}\p{N}\/xX×.,:;# +\-]/gu,' ')
+  .replace(/\s+/g,' ').trim();
+}
+function lineHasUsefulText(value){
+ const t=normalizeOcrLine(value);
+ const compact=t.replace(/[^A-Za-zÀ-ỹ0-9]/g,'');
+ return compact.length>=1 && /[A-Za-zÀ-ỹ0-9]/.test(t);
+}
 function getFirstTwoLines(result){
  const lines=(result?.data?.lines||[])
-  .map(line=>({text:String(line.text||'').replace(/\s+/g,' ').trim(),y:Number(line.bbox?.y0??line.baseline?.y0??0),confidence:Number(line.confidence??0)}))
-  .filter(x=>x.text);
+  .map(line=>({
+   text:normalizeOcrLine(line.text),
+   y:Number(line.bbox?.y0??line.baseline?.y0??0),
+   confidence:Number(line.confidence??0)
+  }))
+  .filter(x=>x.text && lineHasUsefulText(x.text) && x.confidence>=25);
  lines.sort((a,b)=>a.y-b.y);
  const picked=[];
  for(const line of lines){
-  if(!picked.some(p=>Math.abs(p.y-line.y)<8&&p.text===line.text))picked.push(line);
+  const clean=line.text;
+  if(picked.some(p=>Math.abs(p.y-line.y)<Math.max(10,18)&&p.text===clean))continue;
+  // Hai hàng vật lý đầu tiên; bỏ các hàng chỉ gồm dấu trang trí.
+  picked.push({text:clean,y:line.y,confidence:line.confidence});
   if(picked.length===2)break;
  }
- return picked.map(x=>x.text);
+ return picked;
+}
+function scoreTopRows(rows){
+ if(!rows.length)return -1000;
+ let score=rows.reduce((n,r)=>n+r.confidence,0);
+ const joined=rows.map(r=>r.text).join(' ');
+ if(/\b\d{2,3}\s*\/\s*\d{2,3}\s*[A-Z]?\b/i.test(joined))score+=120;
+ if(/\b\d{1,3}\s*[xX×]\s*\d{1,3}\b/.test(joined))score+=100;
+ if(rows.length>=2)score+=20;
+ if(rows[0] && /^\d{1,3}$/.test(rows[0].text))score+=25;
+ return score;
+}
+async function recognizeTopRows(canvas){
+ const candidates=[];
+ // PSM 6 đọc theo khối; PSM 11 đọc chữ rải rác. Chọn kết quả có
+ // cấu trúc giống 2 dòng đầu của tem, không lấy phần hướng dẫn giặt bên dưới.
+ for(const psm of [Tesseract.PSM.SINGLE_BLOCK,Tesseract.PSM.SPARSE_TEXT]){
+  await state.worker.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1',user_defined_dpi:'300'});
+  const result=await state.worker.recognize(canvas);
+  const rows=getFirstTwoLines(result);
+  candidates.push({rows,score:scoreTopRows(rows)});
+ }
+ candidates.sort((a,b)=>b.score-a.score);
+ return candidates[0]?.rows||[];
 }
 async function captureAndRead(){
- if(state.busy||!state.running)return;state.busy=true;
+ if(state.busy||!state.running)return;
+ state.busy=true;
  try{
-  setStatus('Đang đọc 2 dòng trên cùng của tem…');
+  setStatus('Đang xử lý toàn bộ tem; đối chiếu 2 dòng trên cùng…');
   const canvas=makeOcrCanvas($('video'));
-  const result=await state.worker.recognize(canvas);
-  const firstTwo=getFirstTwoLines(result);
-  const text=firstTwo.join('\n').slice(0,500);
-  $('ocrResult').value=text;state.total++;updateCounters();
+  const firstTwo=await recognizeTopRows(canvas);
+  const text=firstTwo.map(x=>x.text).join('\n').slice(0,200);
+  $('ocrResult').value=text;
+  state.total++;updateCounters();
   const chosen=selectedStyle(),id=requestId(),parsed=parseLabel(text);
-  const payload={requestId:id,style:chosen.style,season:chosen.season,ocrText:text,size:parsed.size,gang:parsed.gang,brand:parsed.brand,
-   reason:text?'Không nhận diện được dữ liệu từ hai dòng đầu tiên.':'Không nhận diện được chữ ở vùng tem.'};
-  if(text){
+  const payload={
+   requestId:id,style:chosen.style,season:chosen.season,ocrText:text,
+   size:parsed.size,gang:parsed.gang,brand:parsed.brand,
+   reason:text?'Không đọc đủ tin cậy hai dòng đầu tiên của tem.':'Không nhận diện được chữ ở hai dòng đầu tiên.'
+  };
+  if(text && firstTwo.length===2 && firstTwo.every(x=>x.confidence>=25)){
    const saved=await postAndWait('saveSuccess',payload);
    if(!saved?.ok)throw new Error(saved?.error||'Không ghi được CSDL.');
-   state.ok++;$('lastResult').textContent='Đã ghi CSDL · '+(saved.savedAt||'')+' · '+chosen.style+' · '+text.replace(/\n/g,' / ');
-   setStatus('Đã ghi nhận 1 tem. Đưa tem tiếp theo vào camera.','ok');showSuccess();
+   state.ok++;
+   $('lastResult').textContent='Đã ghi CSDL · '+(saved.savedAt||'')+' · '+chosen.style+' · '+text.replace(/\n/g,' / ');
+   setStatus('Đã ghi nhận 1 tem. Đưa tem tiếp theo vào camera.','ok');
+   showSuccess();
   }else{
    const failed=await postAndWait('saveFailure',payload);
    if(!failed?.ok)throw new Error(failed?.error||'Không ghi được CSDL_OCR_LOI.');
-   state.fail++;$('lastResult').textContent='Không đọc được 2 dòng đầu · Đã lưu CSDL_OCR_LOI.';
-   setStatus('Không đọc được chữ ở hai dòng đầu; đã ghi nhận lỗi OCR.','err');
+   state.fail++;
+   $('lastResult').textContent='Không đọc đủ 2 dòng đầu · Đã lưu CSDL_OCR_LOI.';
+   setStatus('OCR chưa đọc đủ 2 dòng đầu; đã chuyển vào CSDL_OCR_LOI.','err');
   }
   updateCounters();
- }catch(e){setStatus('Lỗi lượt quét: '+e.message,'err');}
- finally{state.busy=false;state.previous=null;state.motionSeen=false;state.stableAt=0;}
+ }catch(e){
+  setStatus('Lỗi lượt quét: '+e.message,'err');
+ }finally{
+  state.busy=false;state.previous=null;state.motionSeen=false;state.stableAt=0;
+ }
 }
 function parseLabel(raw){
  const lines=String(raw||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
